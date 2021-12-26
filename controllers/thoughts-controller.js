@@ -48,6 +48,7 @@ const thoughtsController = {
         .catch(err => res.status(400).json(err));
     },
 
+    // PUT  /api/thoughts/:id
     updateThought({ params, body }, res) {
         Thoughts.findOneAndUpdate({ _id: params.id }, body, { new: true })
           .then(dbThoughtData => {
@@ -78,6 +79,39 @@ const thoughtsController = {
                 res.json({message: 'Successfully deleted the thought'});
             })
             .catch(err => res.status(500).json(err));
+        })
+        .catch(err => res.status(500).json(err));
+    },
+
+    // Put /api/thoughts/thoughtsId/reactions
+    addReaction({ params, body }, res) {
+        Thoughts.findOneAndUpdate(
+            { _id: params.thoughtsId },
+            { $push: { reactions: body } },
+            { new: true }
+        )
+            .then(dbThoughtData => {
+                if (!dbThoughtData) {
+                  res.status(404).json({ message: 'No Thought found with this id!' });
+                  return;
+                }
+                res.json(dbThoughtData);
+              })
+              .catch(err => res.json(err));        
+    },
+
+    deleteReaction({ params, body }, res) {
+        Thoughts.findOneAndUpdate(
+            { _id: params.thoughtsId },
+            { $pull: { reactions: { reactionId: body.reactionId } } },
+            { new: true, runValidators: true }
+        )
+        .then(dbThoughtData => {
+            if (!dbThoughtData) {
+                res.status(404).json({ message: 'No thought found with this id' });
+                return;
+            }
+            res.json({message: 'Successfully deleted the reaction'});
         })
         .catch(err => res.status(500).json(err));
     },

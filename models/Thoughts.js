@@ -48,11 +48,12 @@ const ThoughtsSchema = new Schema (
         toJSON: {
             virtuals: true,
             getters: true
-        } 
+        },
+        id: false
     }
 );
 
-ReactionSchema.virtuals('reactionCount').get(function() {
+ThoughtsSchema.virtual('reactionCount').get(function() {
     return this.reactions.length;
 });
 
