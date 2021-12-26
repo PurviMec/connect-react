@@ -9,11 +9,8 @@ const {
 } = require ('../../controllers/thoughts-controller');
 
 router
-.route('/')
-.get(getAllThoughts)
-
-router
-    .route('/:userId')
+    .route('/')
+    .get(getAllThoughts)
     .post(addThought);
 
 router
