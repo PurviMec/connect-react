@@ -28,24 +28,24 @@ const thoughtsController = {
     },
 
     // POST /api/thoughts
-    addThought({ body }, res) {
+    addThought({ params, body }, res) {
+        console.log("INCOMING BODY", body)
         Thoughts.create(body)
-        .then(dbThoughtData => {
-            User.findOneAndUpdate(
-                { _id: body.userId },
-                { $push: { thoughts: dbThoughtData._id } },
-                { new: true }
-            )
+            .then(({ _id }) => {
+                return User.findOneAndUpdate(
+                    { _id: params.userId },
+                    { $push: { thoughts: _id } },
+                    { new: true }
+                );
+            })
             .then(dbUserData => {
                 if (!dbUserData) {
-                    res.status(404).json({ message: 'No user found with this id' });
+                    res.status(404).json({ message: 'No User found with this id! first error' });
                     return;
                 }
                 res.json(dbUserData);
             })
             .catch(err => res.json(err));
-        })
-        .catch(err => res.status(400).json(err));
     },
 
     // PUT  /api/thoughts/:id
@@ -100,6 +100,7 @@ const thoughtsController = {
               .catch(err => res.json(err));        
     },
 
+    // Delete /api/thoughts/thoughtsId/reactions
     deleteReaction({ params, body }, res) {
         Thoughts.findOneAndUpdate(
             { _id: params.thoughtsId },
